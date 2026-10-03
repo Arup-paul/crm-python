@@ -1,0 +1,12 @@
+# Secrets: never commit the real .env (only .env.example)
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# User uploads
+media/
+
+# Frontend packages (Day 12+)
+node_modules/
