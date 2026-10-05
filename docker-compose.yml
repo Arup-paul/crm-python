@@ -27,6 +27,24 @@ services:
       timeout: 3s
       retries: 10
 
+  web:
+    build:
+      context: ./backend
+      args:
+        UID: ${HOST_UID:-1000}
+        GID: ${HOST_GID:-1000}
+    image: crm-backend:dev
+    env_file: .env
+    volumes:
+      - ./backend:/app   # live code: save a file → runserver reloads
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   redis_data:
