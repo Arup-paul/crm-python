@@ -33,3 +33,8 @@
 - New packages live in the image, so `requirements.txt` changes need `docker compose build` + `up -d`, not `restart`.
 - DRF defaults: login required unless `AllowAny`, 25 per page, browsable API only in `DEBUG`. `/api/health/` answers 200 or 503.
 - A custom exception handler gives every error `{"error": {code, message, fields}}`; the frontend checks `code`, since session auth answers 403 where JWT answers 401.
+
+## Day 8 — JWT login
+- `/api/v1/auth/login/` gives an access token (10 min) and a refresh token (7 days, rotated and blacklisted); `/api/v1/auth/me/` needs the access token, and without one it's 401.
+- A JWT's payload is readable by anyone; only the signature (made with `SECRET_KEY`) stops it being changed. Never put secrets in it.
+- Testing junk, changed and expired tokens found a crash in the Day 7 error handler (dict-shaped errors). Test the bad cases too.

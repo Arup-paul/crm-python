@@ -187,6 +187,7 @@ Today a logged-out visitor gets **403**, even though "not logged in" should real
 | VS Code said "package not installed" | It looks at your computer, not the container | Ignore it |
 | Test pages answered 403 instead of showing the error we wanted to test | Every page needs login by default, and the test wasn't logged in | Logged in for the test. It also proved the "locked by default" rule works. |
 | Logged out gave 403, not 401 | The cookie login can't say *how* to log in | Normal for now; fixed on Day 8 |
+| *(Found on Day 8)* Bad JWT tokens crashed the error handler with a 500 | Some errors (like SimpleJWT's) store a dict, not one piece of text | Fixed in `core/exceptions.py` on Day 8, see [Day 8 notes](day-08-jwt-auth.md#problems-we-hit) |
 
 ---
 

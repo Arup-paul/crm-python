@@ -43,5 +43,8 @@ def api_exception_handler(exc, context):
             "error": {"code": "validation_error", "message": "Some fields are invalid.", "fields": fields}
         }
     else:
-        response.data = {"error": {"code": exc.detail.code, "message": str(exc.detail)}}
+        detail = exc.detail
+        if isinstance(detail, dict):  # e.g. SimpleJWT's InvalidToken: {"detail": ..., "code": ..., "messages": [...]}
+            detail = detail.get("detail", exc.default_detail)
+        response.data = {"error": {"code": getattr(detail, "code", exc.default_code), "message": str(detail)}}
     return response

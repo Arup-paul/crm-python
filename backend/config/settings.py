@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
 
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Third-party apps
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     # Local apps
     'core',
     'accounts',
@@ -136,7 +138,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Django REST framework: defaults for every API view (ADR 005).
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",  # JWT comes on Day 8
+        "rest_framework_simplejwt.authentication.JWTAuthentication",  # first, so logged out = 401
+        # The /admin/ login cookie works in the browsable API, in development only.
+        *(["rest_framework.authentication.SessionAuthentication"] if DEBUG else []),
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -148,4 +152,13 @@ REST_FRAMEWORK = {
         *(["rest_framework.renderers.BrowsableAPIRenderer"] if DEBUG else []),
     ],
     "EXCEPTION_HANDLER": "core.exceptions.api_exception_handler",
+}
+
+# JWT login (Day 8). Tokens are signed with SECRET_KEY.
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
 }
