@@ -18,3 +18,8 @@
 ## Day 4 — Design decisions (ADRs)
 - Five ADRs in `docs/decisions/`: custom fields in JSON, tags as M2M, soft delete, explicit FKs for activities, API conventions.
 - An ADR records the options, the decision and *why*, so later I don't have to re-argue the same choice.
+
+## Day 5 — Custom User with email login
+- `accounts.User` extends `AbstractUser`: email login, required first name, a `role` (static for now, dynamic in Phase 7.5).
+- `AUTH_USER_MODEL` had to be set before the first `migrate`, because `django_admin_log` and others get FKs to the user table.
+- `set_password()` stores a hash; emails are stored lowercase so login ignores capitals.
