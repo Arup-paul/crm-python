@@ -28,3 +28,8 @@
 - `core` app: abstract `TimeStampedModel`, `AuditModel` and `SoftDeleteModel` (`objects` hides archived rows, `all_objects` sees all). Abstract = no table, so no migration.
 - `save(update_fields=...)` must list `updated_at`, or `auto_now` doesn't run.
 - `docs/architecture.md`: every write goes through a service. Signals are hidden, skipped by `bulk_create()`/`update()`, and don't know the user.
+
+## Day 7 — DRF setup, health check & error shape
+- New packages live in the image, so `requirements.txt` changes need `docker compose build` + `up -d`, not `restart`.
+- DRF defaults: login required unless `AllowAny`, 25 per page, browsable API only in `DEBUG`. `/api/health/` answers 200 or 503.
+- A custom exception handler gives every error `{"error": {code, message, fields}}`; the frontend checks `code`, since session auth answers 403 where JWT answers 401.

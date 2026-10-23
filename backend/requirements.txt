@@ -1,2 +1,4 @@
 Django>=5.2,<5.3
 psycopg[binary]>=3.2,<4
+djangorestframework>=3.18,<3.19
+redis>=8.0,<9
