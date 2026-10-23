@@ -23,3 +23,8 @@
 - `accounts.User` extends `AbstractUser`: email login, required first name, a `role` (static for now, dynamic in Phase 7.5).
 - `AUTH_USER_MODEL` had to be set before the first `migrate`, because `django_admin_log` and others get FKs to the user table.
 - `set_password()` stores a hash; emails are stored lowercase so login ignores capitals.
+
+## Day 6 — Shared base models & code conventions
+- `core` app: abstract `TimeStampedModel`, `AuditModel` and `SoftDeleteModel` (`objects` hides archived rows, `all_objects` sees all). Abstract = no table, so no migration.
+- `save(update_fields=...)` must list `updated_at`, or `auto_now` doesn't run.
+- `docs/architecture.md`: every write goes through a service. Signals are hidden, skipped by `bulk_create()`/`update()`, and don't know the user.
