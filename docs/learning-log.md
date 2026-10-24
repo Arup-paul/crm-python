@@ -38,3 +38,8 @@
 - `/api/v1/auth/login/` gives an access token (10 min) and a refresh token (7 days, rotated and blacklisted); `/api/v1/auth/me/` needs the access token, and without one it's 401.
 - A JWT's payload is readable by anyone; only the signature (made with `SECRET_KEY`) stops it being changed. Never put secrets in it.
 - Testing junk, changed and expired tokens found a crash in the Day 7 error handler (dict-shaped errors). Test the bad cases too.
+
+## Day 9 — Auth for a browser app
+- Login now returns only `access` in the body; the refresh token goes in an `HttpOnly`, `SameSite=Lax` cookie limited to `/api/v1/auth/`, so XSS can't read it.
+- `/refresh/` reads the cookie (override `get_serializer` on SimpleJWT's view) and rotates it; `/logout/` blacklists it and deletes the cookie with the same `path`, needs no access token, and always answers 204.
+- Tested with curl `-c`/`-b` cookie jars: old and logged-out cookies get 401 "Token is blacklisted".

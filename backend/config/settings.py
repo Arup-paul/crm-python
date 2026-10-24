@@ -162,3 +162,13 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
 }
+
+# Refresh token cookie (Day 9). The browser stores it; JavaScript can't read it.
+REFRESH_COOKIE_NAME = "refresh_token"
+REFRESH_COOKIE = {  # passed straight to response.set_cookie()
+    "max_age": int(SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds()),
+    "path": "/api/v1/auth/",
+    "httponly": True,
+    "secure": not DEBUG,
+    "samesite": "Lax",
+}
