@@ -43,3 +43,8 @@
 - Login now returns only `access` in the body; the refresh token goes in an `HttpOnly`, `SameSite=Lax` cookie limited to `/api/v1/auth/`, so XSS can't read it.
 - `/refresh/` reads the cookie (override `get_serializer` on SimpleJWT's view) and rotates it; `/logout/` blacklists it and deletes the cookie with the same `path`, needs no access token, and always answers 204.
 - Tested with curl `-c`/`-b` cookie jars: old and logged-out cookies get 401 "Token is blacklisted".
+
+## Day 10 — Test setup + auth tests
+- pytest + pytest-django; `pytest.ini` points at `config.settings`, `--reuse-db` keeps `test_crm` between runs. Each test runs in a rolled-back transaction, never on the real `crm` DB.
+- `conftest.py` fixtures: `make_user(role=...)` (a factory, unique emails), `api_client` (anonymous, remembers cookies), `auth_client(user)` (a new client with a real JWT, not `force_authenticate`).
+- 10 tests lock in Days 5, 8 and 9 (login, case-insensitive email, `/me`, cookie refresh + rotation, logout blacklist): `docker compose exec web pytest` → 10 passed in ~3 s.
