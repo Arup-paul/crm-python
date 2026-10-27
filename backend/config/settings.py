@@ -90,8 +90,16 @@ DATABASES = {
     }
 }
 
-# Redis: health check now; cache and Celery later.
+# Redis DB 0: health check now, Celery later (Slice 4).
 REDIS_URL = os.environ["REDIS_URL"]
+
+# Cache (Day 11): Redis DB 1, so clearing the cache never touches Celery's queue in DB 0.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.environ["REDIS_CACHE_URL"],
+    }
+}
 
 
 # Password validation
@@ -152,6 +160,13 @@ REST_FRAMEWORK = {
         *(["rest_framework.renderers.BrowsableAPIRenderer"] if DEBUG else []),
     ],
     "EXCEPTION_HANDLER": "core.exceptions.api_exception_handler",
+    # Throttling (Day 11): a view opts in with `throttle_scope`; counts live in the cache (Redis DB 1).
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "login": "5/min",
+    },
 }
 
 # JWT login (Day 8). Tokens are signed with SECRET_KEY.

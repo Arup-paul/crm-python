@@ -48,3 +48,8 @@
 - pytest + pytest-django; `pytest.ini` points at `config.settings`, `--reuse-db` keeps `test_crm` between runs. Each test runs in a rolled-back transaction, never on the real `crm` DB.
 - `conftest.py` fixtures: `make_user(role=...)` (a factory, unique emails), `api_client` (anonymous, remembers cookies), `auth_client(user)` (a new client with a real JWT, not `force_authenticate`).
 - 10 tests lock in Days 5, 8 and 9 (login, case-insensitive email, `/me`, cookie refresh + rotation, logout blacklist): `docker compose exec web pytest` → 10 passed in ~3 s.
+
+## Day 11 — Redis cache & login throttling
+- `CACHES` → Redis DB 1 (`REDIS_CACHE_URL`); DB 0 stays for Celery, so `cache.clear()` (`FLUSHDB`) can't drop queued jobs. `.env` changes need `up -d`, not `restart`.
+- `ScopedRateThrottle` set globally; `LoginView.throttle_scope = "login"` at `5/min` per IP. The 6th try → 429 `throttled` + `Retry-After`, keys visible as `:1:throttle_login_<ip>` in `redis-cli -n 1`.
+- The throttle polluted the tests (counts survived in Redis, outside the DB rollback). An `autouse` `isolated_cache` fixture gives each test an empty LocMemCache: 11 passed, every run.

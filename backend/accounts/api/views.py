@@ -22,6 +22,8 @@ def _move_refresh_to_cookie(response):
 class LoginView(TokenObtainPairView):
     """Email + password in. Access token in the body, refresh token in a cookie."""
 
+    throttle_scope = "login"  # 5 tries a minute per IP (settings.DEFAULT_THROTTLE_RATES)
+
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         _move_refresh_to_cookie(response)

@@ -3,12 +3,20 @@
 from itertools import count
 
 import pytest
+from django.core.cache import cache
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import AccessToken
 
 from accounts.models import User
 
 PASSWORD = "test-pass-123"
+
+
+@pytest.fixture(autouse=True)
+def isolated_cache(settings):
+    """Every test gets an empty in-memory cache: throttle counts never leak between tests or into dev Redis."""
+    settings.CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+    cache.clear()
 
 
 @pytest.fixture

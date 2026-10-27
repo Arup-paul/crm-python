@@ -117,3 +117,18 @@ def test_logout_blacklists_the_token_and_clears_the_cookie(api_client, make_user
 
 def test_logout_without_a_cookie_still_succeeds(api_client):
     assert api_client.post(LOGOUT_URL).status_code == 204
+
+
+# --- throttling (Day 11) ---
+
+
+def test_login_is_throttled_after_5_tries_a_minute(api_client, make_user):
+    user = make_user()
+    for _ in range(5):
+        assert login(api_client, user, password="wrong-password").status_code == 401
+
+    response = login(api_client, user)  # even the right password is refused now
+
+    assert response.status_code == 429
+    assert response.data["error"]["code"] == "throttled"
+    assert "Retry-After" in response.headers
